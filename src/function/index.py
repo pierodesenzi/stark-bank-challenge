@@ -134,7 +134,6 @@ def handler(event, context):
         return {"statusCode": 200, "body": json.dumps(response_body)}
 
     except Exception as e:
-        raise e
         # Log any exceptions that occur during the handling of the event
-        ###logging.error(f"An error occurred during the handling of the event: {str(e)}")
-        ###return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
+        logging.error(f"An error occurred during the handling of the event: {str(e)}")
+        return {"statusCode": 500, "body": json.dumps({"error": str(e)})}

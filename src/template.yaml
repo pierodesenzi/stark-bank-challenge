@@ -3,7 +3,7 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      Runtime: 'python3.9'
+      Runtime: 'python3.12'
       Role: arn:aws:iam::423623843304:role/LambdaExecutionRole3
       Handler: 'index.handler'
       Code:

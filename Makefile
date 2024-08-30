@@ -10,25 +10,33 @@ STACK_NAME=LambdaStack
 TEST_REQUIREMENTS_FILE=tests/test_requirements.txt
 TEMP_DIR=src/function/temp_dir
 
-# Deploy Routine
-deploy:
+install:
 	@echo "Installing dependencies..."
+	pip install -r $(REQUIREMENTS_FILE)
+deploy:
+	@echo "Downloading dependencies..."
 	mkdir -p $(TEMP_DIR)
 	pip install -r $(REQUIREMENTS_FILE) -t $(TEMP_DIR)
 	cp src/function/index.py $(TEMP_DIR)
 	@echo "Creating ZIP file..."
-	zip -r $(ZIP_FILE) $(TEMP_DIR)
+	cd $(TEMP_DIR) && zip -r ../../../$(ZIP_FILE) .
 	rm -rf $(TEMP_DIR)
-	@echo "Creating S3 bucket..."
-	aws s3 mb s3://$(S3_BUCKET) || true # Use 'true' to ignore errors if bucket already exists
+	@echo "Creating S3 bucket if it does not exist..."
+	aws s3 mb s3://$(S3_BUCKET) || true
 	@echo "Uploading ZIP file to S3..."
 	aws s3 cp $(ZIP_FILE) $(S3_ZIP_PATH)
+	rm $(ZIP_FILE)
 	@echo "Deploying CloudFormation stack..."
 	aws cloudformation deploy --template-file $(TEMPLATE_FILE) --stack-name $(STACK_NAME) --capabilities CAPABILITY_NAMED_IAM
 	@echo "Deployment complete."
 
 tear-down:
+	@echo "Tearing down stack created with AWS CloudFormation..."
 	aws cloudformation delete-stack --stack-name $(STACK_NAME)
+
+force-tear-down:
+	@echo "Forcefully tearing down stack created with AWS CloudFormation (for stacks in DELETE_FAILED state)..."
+	aws cloudformation delete-stack --stack-name $(STACK_NAME) --deletion-mode FORCE_DELETE_STACK
 
 # Test Routine
 test:
@@ -37,6 +45,3 @@ test:
 	@echo "Running tests..."
 	pytest -vvs .
 	@echo "Tests complete."
-
-# Default target
-all: deploy test
