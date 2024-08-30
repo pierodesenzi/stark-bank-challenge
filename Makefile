@@ -1,7 +1,7 @@
 # Makefile
 
 # Variables
-REQUIREMENTS_FILE=src/function/requirements.txt
+REQUIREMENTS_FILE=requirements.txt
 ZIP_FILE=lambda_resources.zip
 S3_BUCKET=stark-service
 S3_ZIP_PATH=s3://$(S3_BUCKET)/lambda_resources.zip
