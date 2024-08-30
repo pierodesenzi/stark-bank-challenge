@@ -71,7 +71,7 @@ You can deploy this Lambda function using AWS CloudFormation, AWS CLI, or other 
 To run the tests:
 
 ```bash
-pytest tests/
+make test
 ```
 
 The tests include:
