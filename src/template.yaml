@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Resources:
+  LambdaFunction:
+    Type: 'AWS::Lambda::Function'
+    Properties:
+      FunctionName: 'LambdaFunction'
+      Runtime: 'python3.9'
+      Role: arn:aws:iam::423623843304:role/LambdaExecutionRole3
+      Handler: 'index.handler'
+      Code:
+        S3Bucket: 'stark-webhook'
+        S3Key: 'lambda_function.zip'
+      Environment:
+        Variables:
+          PRIVATE_KEY: 'PRIVATE_KEY'
+          PROJECT_ID: 'PROJECT_ID'
+
+  ApiGateway:
+    Type: 'AWS::ApiGateway::RestApi'
+    Properties:
+      Name: 'StarkApi'
+
+  ApiGatewayResource:
+    Type: 'AWS::ApiGateway::Resource'
+    Properties:
+      ParentId: !GetAtt ApiGateway.RootResourceId
+      PathPart: 'webhook'
+      RestApiId: !Ref ApiGateway
+
+  ApiGatewayMethod:
+    Type: 'AWS::ApiGateway::Method'
+    Properties:
+      AuthorizationType: 'NONE'
+      HttpMethod: 'POST'
+      ResourceId: !Ref ApiGatewayResource
+      RestApiId: !Ref ApiGateway
+      Integration:
+        IntegrationHttpMethod: 'POST'
+        Type: 'AWS_PROXY'
+        Uri: !Sub 'arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${LambdaFunction.Arn}/invocations'
+      MethodResponses:
+        - StatusCode: '200'
+
+  ApiGatewayDeployment:
+    Type: 'AWS::ApiGateway::Deployment'
+    DependsOn: ApiGatewayMethod
+    Properties:
+      RestApiId: !Ref ApiGateway
+      StageName: 'prod'
+
+  LambdaInvokePermission:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      Action: 'lambda:InvokeFunction'
+      FunctionName: !Ref LambdaFunction
+      Principal: 'apigateway.amazonaws.com'
