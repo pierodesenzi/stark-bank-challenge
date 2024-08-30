@@ -6,6 +6,7 @@ Resources:
       Runtime: 'python3.12'
       Role: arn:aws:iam::423623843304:role/LambdaExecutionRole3
       Handler: 'index.handler'
+      Timeout: 10
       Code:
         S3Bucket: 'stark-service'
         S3Key: 'lambda_resources.zip'
