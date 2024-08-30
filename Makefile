@@ -6,8 +6,8 @@ ZIP_FILE=lambda_resources.zip
 S3_BUCKET=stark-service
 S3_ZIP_PATH=s3://$(S3_BUCKET)/lambda_resources.zip
 TEMPLATE_FILE=src/template.yaml
-STACK_NAME=LambdaStack9
-TEST_REQUIREMENTS_FILE=tests/requirements.txt
+STACK_NAME=LambdaStack
+TEST_REQUIREMENTS_FILE=tests/test_requirements.txt
 TEMP_DIR=src/function/temp_dir
 
 # Deploy Routine
@@ -15,8 +15,6 @@ deploy:
 	@echo "Installing dependencies..."
 	mkdir -p $(TEMP_DIR)
 	pip install -r $(REQUIREMENTS_FILE) -t $(TEMP_DIR)
-	mkdir src/function/temp_dir
-	pip install -r $(REQUIREMENTS_FILE) -t src/function/
 	cp src/function/index.py $(TEMP_DIR)
 	@echo "Creating ZIP file..."
 	zip -r $(ZIP_FILE) $(TEMP_DIR)
@@ -39,10 +37,6 @@ test:
 	@echo "Running tests..."
 	pytest -vvs .
 	@echo "Tests complete."
-
-part:
-	mkdir -p $(TEMP_DIR)
-	pip install -r $(REQUIREMENTS_FILE) -t $(TEMP_DIR)
 
 # Default target
 all: deploy test

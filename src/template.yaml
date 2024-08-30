@@ -3,12 +3,11 @@ Resources:
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
-      FunctionName: 'LambdaFunction'
       Runtime: 'python3.9'
       Role: arn:aws:iam::423623843304:role/LambdaExecutionRole3
       Handler: 'index.handler'
       Code:
-        S3Bucket: 'stark-webhook'
+        S3Bucket: 'stark-service'
         S3Key: 'lambda_resources.zip'
       Environment:
         Variables:
