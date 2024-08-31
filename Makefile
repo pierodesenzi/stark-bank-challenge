@@ -36,7 +36,7 @@ force-tear-down:
 	@echo "Forcefully tearing down stack created with AWS CloudFormation (for stacks in DELETE_FAILED state)..."
 	aws cloudformation delete-stack --stack-name $(STACK_NAME) --deletion-mode FORCE_DELETE_STACK
 
-tests:
+test:
 	@echo "Installing base dependencies..."
 	pip install -r $(REQUIREMENTS_FILE)
 	@echo "Installing test dependencies..."

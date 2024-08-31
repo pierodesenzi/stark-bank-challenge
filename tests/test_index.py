@@ -3,7 +3,15 @@ import boto3
 import pytest
 import moto
 import os
-from src.function.index import get_secrets, handler
+import sys
+from pathlib import Path
+
+
+# Add the root directory to sys.path
+root_dir = Path(__file__).resolve().parents[2]
+sys.path.append(str(root_dir))
+
+from src.app.index import handler, get_secrets
 
 
 # Sample event for testing

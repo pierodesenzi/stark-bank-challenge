@@ -106,11 +106,10 @@ To deploy the project on AWS using CloudFormation:
 make deploy
 ```
 
-In order for the webhook to be called when a new invoice is created, go to Stark Bank's Sandbox, create a Webhook, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
+In order for the webhook to be called when a new invoice is created, go to Stark Bank's Sandbox, create a Webhook, add `invoice` to the `Subscriptions` field, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
 ```
 https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
 ```
-Then add `invoice` to the `Subscriptions` field.
 
 #### 3. Periodically creating invoices
 
