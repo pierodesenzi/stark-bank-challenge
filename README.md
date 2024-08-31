@@ -17,7 +17,9 @@ This project is an AWS Lambda function designed to handle incoming webhook reque
 ├── src
 │   ├── template.yaml          # template for AWS CloudFormation
 │   └── function
-│       └── index.py           # AWS Lambda code
+│       ├── local_invoker.py   # Script to call the Lambda function locally
+│       ├── periodic_issuer.py # Script to issue periodic invoices
+│       └── index.py           # Code to be deployed on AWS Lambda
 ├── tests
 │   ├── __init__.py            # Initialization file
 │   ├── test_requirements.txt  # Python dependencies for testing
@@ -93,6 +95,7 @@ To simulate locally a webhook call, you need to invoke the function `handler(eve
 ```python
 {"body": '{"event": {"log": {"invoice": {"nominalAmount": 100}}}}'}
 ```
+
 
 To do so, you can run the file `src/function/local_invoker`.
 
