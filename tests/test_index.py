@@ -81,7 +81,7 @@ def test_get_secrets(mock_secrets_manager):
 
 
 # Test handler function for successful execution
-def test_handler_success(api_gateway_event, mock_secrets_manager):
+def test_handler_success(api_gateway_event):
     response = handler(api_gateway_event, None)
 
     assert response["statusCode"] == 200  # Ensure success status code
@@ -91,7 +91,7 @@ def test_handler_success(api_gateway_event, mock_secrets_manager):
 
 
 # Test handler function when no body is provided in the event
-def test_handler_no_body(api_gateway_event, mock_secrets_manager):
+def test_handler_no_body(api_gateway_event):
     api_gateway_event["body"] = None  # Simulate missing body
 
     response = handler(api_gateway_event, None)
@@ -102,7 +102,7 @@ def test_handler_no_body(api_gateway_event, mock_secrets_manager):
 
 
 # Test handler function when amount is zero
-def test_handler_amount_zero(api_gateway_event_amount_zero, mock_secrets_manager):
+def test_handler_amount_zero(api_gateway_event_amount_zero):
     response = handler(api_gateway_event_amount_zero, None)
 
     assert response["statusCode"] == 422  # Ensure error status code
@@ -111,7 +111,7 @@ def test_handler_amount_zero(api_gateway_event_amount_zero, mock_secrets_manager
 
 
 # Test handler function when amount is missing
-def test_handler_missing_amount(api_gateway_event_no_amount, mock_secrets_manager):
+def test_handler_missing_amount(api_gateway_event_no_amount):
     response = handler(api_gateway_event_no_amount, None)
 
     assert response["statusCode"] == 422  # Ensure error status code
