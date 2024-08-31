@@ -8,7 +8,7 @@ from botocore.exceptions import ClientError, NoCredentialsError, PartialCredenti
 logging.basicConfig(level=logging.INFO)
 
 
-def get_secrets(secret_names, region_name="us-west-2"):
+def get_secrets(secret_names: list[str], region_name: str="us-west-2") -> dict[str, str | int]:
     """
     Retrieve secrets from AWS Secrets Manager.
 
@@ -67,13 +67,14 @@ def _evaluate_amount(
     return None, amount
 
 
-def handler(event, context=None):
+def handler(event: dict[str, any], context=None) -> dict[str, str | int]:
     """
     AWS Lambda function handler to process incoming webhook requests.
 
     Args:
         event (dict): The event data, as an API Gateway request.
         context (LambdaContext): The runtime information of the Lambda function.
+            Not part of the AWS SDK for Python (boto3).
 
     Returns:
         dict: The response object with status code and body.
