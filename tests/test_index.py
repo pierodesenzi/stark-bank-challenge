@@ -15,7 +15,7 @@ def api_gateway_event():
                 "event": {
                     "log": {
                         "invoice": {
-                            "nominalAmount": 1  # Set a nominal amount for testing
+                            "amount": 1  # Set a nominal amount for testing
                         }
                     }
                 }
@@ -32,7 +32,7 @@ def api_gateway_event_amount_zero():
                 "event": {
                     "log": {
                         "invoice": {
-                            "nominalAmount": 0  # Test case for zero nominal amount
+                            "amount": 0  # Test case for zero nominal amount
                         }
                     }
                 }
@@ -49,7 +49,7 @@ def api_gateway_event_no_amount():
                 "event": {
                     "log": {
                         "invoice": {
-                            # Missing nominalAmount field for testing error handling
+                            # Missing amount field for testing error handling
                         }
                     }
                 }
@@ -109,23 +109,23 @@ def test_handler_no_body(api_gateway_event, mock_secrets_manager):
     assert body["error"] == "No body found in the event"
 
 
-# Test handler function when nominalAmount is zero
-def test_handler_nominalAmount_zero(
+# Test handler function when amount is zero
+def test_handler_amount_zero(
     api_gateway_event_amount_zero, mock_secrets_manager
 ):
     response = handler(api_gateway_event_amount_zero, None)
 
     assert response["statusCode"] == 422  # Ensure error status code
     body = json.loads(response["body"])
-    assert body["error"] == "nominalAmount cannot be 0"
+    assert body["error"] == "amount cannot be 0"
 
 
-# Test handler function when nominalAmount is missing
-def test_handler_missing_nominalAmount(
+# Test handler function when amount is missing
+def test_handler_missing_amount(
     api_gateway_event_no_amount, mock_secrets_manager
 ):
     response = handler(api_gateway_event_no_amount, None)
 
     assert response["statusCode"] == 422  # Ensure error status code
     body = json.loads(response["body"])
-    assert body["error"] == "nominalAmount not found in event body"
+    assert body["error"] == "amount not found in event body"

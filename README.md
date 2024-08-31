@@ -98,7 +98,7 @@ https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
 To simulate locally a webhook call, you need to invoke the function `handler(event, context=None)` in `index.py` with the following dict as the first parameter:
 
 ```python
-{"body": '{"event": {"log": {"invoice": {"nominalAmount": 100}}}}'}
+{"body": '{"event": {"log": {"invoice": {"amount": 100}}}}'}
 ```
 
 
@@ -139,7 +139,7 @@ To run the tests locally, you need authentication variables to connect to Stark 
 To install all packages (base and testing) and run the tests:
 
 ```bash
-make test-routine
+make tests
 ```
 
 To only run the tests, if you already have the dependencies installed:
@@ -153,8 +153,8 @@ The tests include:
 - **`test_get_secrets`**: Ensures that secrets are correctly retrieved from AWS Secrets Manager.
 - **`test_handler_success`**: Tests a successful webhook event processing.
 - **`test_handler_no_body`**: Tests the handler's response when no body is present in the event.
-- **`test_handler_nominalAmount_zero`**: Tests the response when the nominal amount is zero.
-- **`test_handler_missing_nominalAmount`**: Tests the response when the nominal amount is missing.
+- **`test_handler_amount_zero`**: Tests the response when the nominal amount is zero.
+- **`test_handler_missing_amount`**: Tests the response when the nominal amount is missing.
 
 
 ## Configuration

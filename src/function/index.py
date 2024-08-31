@@ -55,19 +55,19 @@ def _evaluate_amount(
         body_dict.get("event", {})
         .get("log", {})
         .get("invoice", {})
-        .get("nominalAmount")
+        .get("amount")
     )
     if amount is None:
-        logging.error("nominalAmount not found in event body")
+        logging.error("amount not found in event body")
         return {
             "statusCode": 422,
-            "body": json.dumps({"error": "nominalAmount not found in event body"}),
+            "body": json.dumps({"error": "amount not found in event body"}),
         }, None
     elif amount == 0:
-        logging.error("nominalAmount cannot be 0")
+        logging.error("amount cannot be 0")
         return {
             "statusCode": 422,
-            "body": json.dumps({"error": "nominalAmount cannot be 0"}),
+            "body": json.dumps({"error": "amount cannot be 0"}),
         }, 0
     return None, amount
 

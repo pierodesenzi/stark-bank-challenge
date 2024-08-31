@@ -4,7 +4,7 @@ from index import handler
 amount_transferred = 100
 response = handler(
     {
-        "body": f'{{"event": {{"log": {{"invoice": {{"nominalAmount": {amount_transferred}}}}}}}}}'
+        "body": f'{{"event": {{"log": {{"invoice": {{"amount": {amount_transferred}}}}}}}}}'
     }
 )
 
