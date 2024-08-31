@@ -95,7 +95,7 @@ https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
 ```
 
 **1.2 - Simulating Webhook**
-To simulate locally a webhook call, you need to invoke the function `handler(event, context=None)` in index.py with the following dict as the first parameter:
+To simulate locally a webhook call, you need to invoke the function `handler(event, context=None)` in `index.py` with the following dict as the first parameter:
 
 ```python
 {"body": '{"event": {"log": {"invoice": {"nominalAmount": 100}}}}'}
