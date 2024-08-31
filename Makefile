@@ -6,7 +6,7 @@ S3_ZIP_PATH=s3://$(S3_BUCKET)/lambda_resources.zip
 TEMPLATE_FILE=src/template.yaml
 STACK_NAME=LambdaStack
 TEST_REQUIREMENTS_FILE=tests/test_requirements.txt
-TEMP_DIR=src/function/temp_dir
+TEMP_DIR=src/app/temp_dir
 
 install:
 	@echo "Installing dependencies..."
@@ -15,7 +15,7 @@ deploy:
 	@echo "Downloading dependencies..."
 	mkdir -p $(TEMP_DIR)
 	pip install -r $(REQUIREMENTS_FILE) -t $(TEMP_DIR)
-	cp src/function/index.py $(TEMP_DIR)
+	cp src/app/index.py $(TEMP_DIR)
 	@echo "Creating ZIP file..."
 	cd $(TEMP_DIR) && zip -r ../../../$(ZIP_FILE) .
 	rm -rf $(TEMP_DIR)

@@ -18,10 +18,11 @@ The objective of the Lambda function is to receive a webhook call from Stark Ban
 ```bash
 ├── src
 │   ├── template.yaml              # template for AWS CloudFormation
-│   └── function
-│       ├── local_invoker.py       # Script to call the Lambda function locally
+│   ├── app
+│   │   └── index.py               # Code to be deployed on AWS Lambda
+│   └── local
 │       ├── periodic_issuer.py     # Script to issue periodic invoices
-│       ├── index.py               # Code to be deployed on AWS Lambda
+│       ├── local_invoker.py       # Script to call the Lambda function locally
 │       └── local_requirements.txt # Python dependencies for local execution
 ├── tests
 │   ├── __init__.py                # Initialization file
@@ -89,7 +90,7 @@ First of all, install the base dependencies.
 pip install -r requirements.txt
 ```
 
-To simulate locally a webhook call, you can run the file `src/function/local_invoker.py`. This script invokes the function `handler(event, context=None)` in `index.py` with a dict as the first parameter, shaped like the following:
+To simulate locally a webhook call, you can run the file `src/local/local_invoker.py`. This script invokes the function `handler(event, context=None)` in `index.py` with a dict as the first parameter, shaped like the following:
 
 ```python
 {"body": '{"event": {"log": {"invoice": {"amount": 100}}}}'}
@@ -113,9 +114,9 @@ Then add `invoice` to the `Subscriptions` field.
 
 #### 3. Periodically creating invoices
 
-If you need to create invoices for the Stark Bank account on Sandbox, you can pip install `local_requirements.txt` in `src/function` and then run:
+If you need to create invoices for the Stark Bank account on Sandbox, you can pip install `local_requirements.txt` in `src/local` and then run:
 ```bash
-python src/function/periodic_issuer.py
+python src/local/periodic_issuer.py
 ```
 
 This script issues 8 to 12 Invoices every 3 hours to random people for 24 hours. These invoices will trigger the Lambda function deployed on AWS.

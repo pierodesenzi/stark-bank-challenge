@@ -1,4 +1,4 @@
-from index import handler
+from ..app.index import handler
 
 # Calling the function
 amount_transferred = 100
