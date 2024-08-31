@@ -15,7 +15,7 @@ def api_gateway_event():
                 "event": {
                     "log": {
                         "invoice": {
-                            "amount": 1  # Set a nominal amount for testing
+                            "amount": 1  # Set a amount for testing
                         }
                     }
                 }
@@ -32,7 +32,7 @@ def api_gateway_event_amount_zero():
                 "event": {
                     "log": {
                         "invoice": {
-                            "amount": 0  # Test case for zero nominal amount
+                            "amount": 0  # Test case for zero amount
                         }
                     }
                 }
