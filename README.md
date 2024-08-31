@@ -82,12 +82,17 @@ This project is an AWS Lambda function designed to handle incoming webhook reque
 
 **1.1 - Periodically creating invoices**
 
-If you need to create invoices for the app running on AWS, you can install `local_requirements.txt` in `src/function` and then run:
+If you need to create invoices for the Stark Bank account on Sandbox, you can install `local_requirements.txt` in `src/function` and then run:
 ```bash
 python src/function/periodic_issuer.py
 ```
 
 This script issues 8 to 12 Invoices every 3 hours to random people for 24 hours.
+
+In order for the webhook to be called, go to Stark Bank's Sandbox, create a Webhook, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
+```
+https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
+```
 
 **1.2 - Simulating Webhook**
 To simulate locally a webhook call, you need to invoke the function `handler(event, context=None)` in index.py with the following dict as the first parameter:
