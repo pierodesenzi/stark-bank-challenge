@@ -19,7 +19,7 @@ from src.app.index import handler, get_secrets
 def api_gateway_event():
     return {
         "body": json.dumps(
-            {"event": {"log": {"invoice": {"amount": 1}}}}  # Set a amount for testing
+            {"event": {"log": {"invoice": {"amount": 1}}}}  # Set an amount for testing
         )
     }
 
@@ -50,7 +50,7 @@ def api_gateway_event_no_amount():
     }
 
 
-# Fixture for mocking AWS Secrets Manager
+# Fixture for mocking AWS Secrets Manager. Make sure you have "PRIVATE_KEY" and "PROJECT_ID" set up on your env.
 @pytest.fixture(scope="session")
 def mock_secrets_manager():
     with moto.mock_aws():
