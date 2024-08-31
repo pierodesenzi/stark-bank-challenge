@@ -93,7 +93,6 @@ def handler(event, context=None):
 
     try:
         # Extract the 'body' field from the event, which contains the JSON payload
-        breakpoint()
         body_str = event.get("body")
         if not body_str:
             logging.error("No body found in the event")
