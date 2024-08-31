@@ -11,15 +11,7 @@ from src.function.index import get_secrets, handler
 def api_gateway_event():
     return {
         "body": json.dumps(
-            {
-                "event": {
-                    "log": {
-                        "invoice": {
-                            "amount": 1  # Set a amount for testing
-                        }
-                    }
-                }
-            }
+            {"event": {"log": {"invoice": {"amount": 1}}}}  # Set a amount for testing
         )
     }
 
@@ -28,15 +20,7 @@ def api_gateway_event():
 def api_gateway_event_amount_zero():
     return {
         "body": json.dumps(
-            {
-                "event": {
-                    "log": {
-                        "invoice": {
-                            "amount": 0  # Test case for zero amount
-                        }
-                    }
-                }
-            }
+            {"event": {"log": {"invoice": {"amount": 0}}}}  # Test case for zero amount
         )
     }
 
@@ -110,9 +94,7 @@ def test_handler_no_body(api_gateway_event, mock_secrets_manager):
 
 
 # Test handler function when amount is zero
-def test_handler_amount_zero(
-    api_gateway_event_amount_zero, mock_secrets_manager
-):
+def test_handler_amount_zero(api_gateway_event_amount_zero, mock_secrets_manager):
     response = handler(api_gateway_event_amount_zero, None)
 
     assert response["statusCode"] == 422  # Ensure error status code
@@ -121,9 +103,7 @@ def test_handler_amount_zero(
 
 
 # Test handler function when amount is missing
-def test_handler_missing_amount(
-    api_gateway_event_no_amount, mock_secrets_manager
-):
+def test_handler_missing_amount(api_gateway_event_no_amount, mock_secrets_manager):
     response = handler(api_gateway_event_no_amount, None)
 
     assert response["statusCode"] == 422  # Ensure error status code

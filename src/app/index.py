@@ -51,12 +51,7 @@ def _evaluate_amount(
     body_dict: dict[str, any]
 ) -> tuple[dict[str, any] | None, int | None]:
     # Extract the nominal amount from the invoice details in the body
-    amount = (
-        body_dict.get("event", {})
-        .get("log", {})
-        .get("invoice", {})
-        .get("amount")
-    )
+    amount = body_dict.get("event", {}).get("log", {}).get("invoice", {}).get("amount")
     if amount is None:
         logging.error("amount not found in event body")
         return {
