@@ -183,7 +183,7 @@ In `Makefile`, the following parameters can be changed:
   Path to the `test-requirements.txt` file, which contains the Python dependencies needed for testing.
 
 - **`TEMP_DIR`**:
-  The temporary directory used during the build process, typically for storing intermediate files.
+  The temporary directory used during the build process, for storing intermediate files.
 
 
 In `template.yaml`, the following parameters can be changed:
@@ -192,7 +192,7 @@ In `template.yaml`, the following parameters can be changed:
   AWS account ID that owns the IAM role. This is used to construct the ARN for the Lambda execution role.
 
 - **`RoleName`**:
-  Name of the IAM role that the Lambda function will use to execute. This role must have the necessary permissions to access resources like S3, Secrets Manager, Lambda, and CloudFormation.
+  Name of the IAM role that the Lambda function will use to execute. This role must have the necessary permissions to access the resources: S3, Secrets Manager, Lambda, and CloudFormation.
 
 - **`Timeout`**:
   The amount of time that the Lambda function is allowed to run before it is terminated. This is specified in seconds.
