@@ -7,6 +7,7 @@ from botocore.exceptions import ClientError, NoCredentialsError, PartialCredenti
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
+
 def get_secrets(secret_names, region_name="us-west-2"):
     """
     Retrieve secrets from AWS Secrets Manager.
@@ -27,7 +28,7 @@ def get_secrets(secret_names, region_name="us-west-2"):
     # Create a Secrets Manager client
     session = boto3.session.Session()
     client = session.client(service_name="secretsmanager", region_name=region_name)
-    
+
     secrets = {}
 
     # Retrieve each secret by its name
@@ -45,22 +46,30 @@ def get_secrets(secret_names, region_name="us-west-2"):
 
     return secrets
 
-def _evaluate_amount(body_dict: dict[str, any]) -> tuple[dict[str, any] | None, int | None]:
+
+def _evaluate_amount(
+    body_dict: dict[str, any]
+) -> tuple[dict[str, any] | None, int | None]:
     # Extract the nominal amount from the invoice details in the body
-        amount = body_dict.get("event", {}).get("log", {}).get("invoice", {}).get("nominalAmount")
-        if amount is None:
-            logging.error("nominalAmount not found in event body")
-            return {
-                "statusCode": 422,
-                "body": json.dumps({"error": "nominalAmount not found in event body"}),
-            }, None
-        elif amount==0:
-            logging.error("nominalAmount cannot be 0")
-            return {
-                "statusCode": 422,
-                "body": json.dumps({"error": "nominalAmount cannot be 0"}),
-            }, 0
-        return None, amount
+    amount = (
+        body_dict.get("event", {})
+        .get("log", {})
+        .get("invoice", {})
+        .get("nominalAmount")
+    )
+    if amount is None:
+        logging.error("nominalAmount not found in event body")
+        return {
+            "statusCode": 422,
+            "body": json.dumps({"error": "nominalAmount not found in event body"}),
+        }, None
+    elif amount == 0:
+        logging.error("nominalAmount cannot be 0")
+        return {
+            "statusCode": 422,
+            "body": json.dumps({"error": "nominalAmount cannot be 0"}),
+        }, 0
+    return None, amount
 
 
 def handler(event, context=None):
@@ -74,7 +83,7 @@ def handler(event, context=None):
     Returns:
         dict: The response object with status code and body.
     """
-    
+
     # Define the secret names to retrieve
     secret_names = ["PRIVATE_KEY", "PROJECT_ID"]
 
@@ -96,7 +105,10 @@ def handler(event, context=None):
         body_str = event.get("body")
         if not body_str:
             logging.error("No body found in the event")
-            return {"statusCode": 422, "body": json.dumps({"error": "No body found in the event"})}
+            return {
+                "statusCode": 422,
+                "body": json.dumps({"error": "No body found in the event"}),
+            }
 
         # Parse the JSON string into a dictionary
         body_dict = json.loads(body_str)
@@ -125,16 +137,13 @@ def handler(event, context=None):
         response_body = {
             "message": "Webhook received",
             "received_data": body_dict,
-            "transfers_executed":[transfer.id for transfer in transfers]
+            "transfers_executed": [transfer.id for transfer in transfers],
         }
-        #print(response_body["transfers_executed"])
-        #print([transfer.amount for transfer in transfers])
 
         # Return a successful response
         return {"statusCode": 200, "body": json.dumps(response_body)}
 
     except Exception as e:
         # Log any exceptions that occur during the handling of the event
-        ###logging.error(f"An error occurred during the handling of the event: {str(e)}")
-        ###return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
-        raise e
+        logging.error(f"An error occurred during the handling of the event: {str(e)}")
+        return {"statusCode": 500, "body": json.dumps({"error": str(e)})}

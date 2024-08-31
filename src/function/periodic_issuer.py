@@ -9,9 +9,10 @@ from faker import Faker
 faker = Faker()
 
 # Setting up credentials for Stark Bank's API
-private_key = os.getenv('PRIVATE_KEY')
-project = os.getenv('PROJECT_ID')
+private_key = os.getenv("PRIVATE_KEY")
+project = os.getenv("PROJECT_ID")
 starkbank.user = project
+
 
 def generate_invoice():
     return starkbank.Invoice(
@@ -25,6 +26,7 @@ def generate_invoice():
         tags=["immediate"],
     )
 
+
 # Loop for 24 hours, issuing invoices every 3 hours
 end_time = datetime.utcnow() + timedelta(hours=24)
 
@@ -32,7 +34,9 @@ while datetime.utcnow() < end_time:
     # Generate a random number of invoices between 8 and 12
     num_invoices = random.randint(8, 12)
 
-    invoices = starkbank.invoice.create([generate_invoice() for _ in range(num_invoices)])
-    
+    invoices = starkbank.invoice.create(
+        [generate_invoice() for _ in range(num_invoices)]
+    )
+
     # Wait for 3 hours before issuing the next batch of invoices
     time.sleep(3 * 60 * 60)
