@@ -1,7 +1,9 @@
 # Stark Bank Challenge: Lambda Webhook Handler with Stark Bank Integration
 ### by Piero Desenzi
 
-This project is an AWS Lambda function designed to handle incoming webhook requests from Stark Bank. It integrates with the bank's API and utilizes AWS Secrets Manager for secure key management. The function processes the webhook events, performs financial transactions via Stark Bank's API, and returns appropriate responses based on the event data.
+This project is an AWS project based around a Lambda function designed to handle incoming webhook requests from Stark Bank. It integrates with the bank's API and utilizes AWS Secrets Manager for secure key management. The function processes the webhook events, performs financial transactions via Stark Bank's API, and returns appropriate responses based on the event data.
+
+The objective of the Lambda function is to receive a webhook call from Stark Bank via AWS API Gateway describing a new Invoice received, and then take the received amout and transer it to a determined Stark Bank account.
 
 ## Features
 
@@ -9,24 +11,25 @@ This project is an AWS Lambda function designed to handle incoming webhook reque
 - **Stark Bank Integration**: Processes financial transactions using Stark Bank's SDK.
 - **Error Handling**: Comprehensive error handling with logging for seamless debugging and monitoring.
 - **Test Coverage**: Includes unit tests using `pytest` with `moto` for mocking AWS services.
-- **One-line deploy**: The full deployment process on AWS is taken care of using Makefile
+- **One-line deploy**: The full deployment process on AWS is taken care of using Makefile.
 
 ## Project Structure
 
 ```bash
 ├── src
-│   ├── template.yaml          # template for AWS CloudFormation
+│   ├── template.yaml              # template for AWS CloudFormation
 │   └── function
-│       ├── local_invoker.py   # Script to call the Lambda function locally
-│       ├── periodic_issuer.py # Script to issue periodic invoices
-│       └── index.py           # Code to be deployed on AWS Lambda
+│       ├── local_invoker.py       # Script to call the Lambda function locally
+│       ├── periodic_issuer.py     # Script to issue periodic invoices
+│       ├── index.py               # Code to be deployed on AWS Lambda
+│       └── local_requirements.txt # Python dependencies for local execution
 ├── tests
-│   ├── __init__.py            # Initialization file
-│   ├── test_requirements.txt  # Python dependencies for testing
-│   └── test_index.py          # Unit tests for index.py
-├── Makefile                   # Build commands
-├── README.md                  # Project documentation
-└── requirements.txt           # Python dependencies
+│   ├── __init__.py                # Initialization file
+│   ├── test_requirements.txt      # Python dependencies for testing
+│   └── test_index.py              # Unit tests for index.py
+├── Makefile                       # Build commands
+├── README.md                      # Project documentation
+└── requirements.txt               # Python dependencies
 ```
 
 ## Installation
@@ -78,31 +81,21 @@ This project is an AWS Lambda function designed to handle incoming webhook reque
 
 ## Usage
 
-#### 1. Running Locally
+#### 1. Running Locally Simulating a Webhook Call
 
-**1.1 - Periodically creating invoices**
+First of all, install the base dependencies.
 
-If you need to create invoices for the Stark Bank account on Sandbox, you can install `local_requirements.txt` in `src/function` and then run:
 ```bash
-python src/function/periodic_issuer.py
+pip install -r requirements.txt
 ```
 
-This script issues 8 to 12 Invoices every 3 hours to random people for 24 hours.
-
-In order for the webhook to be called, go to Stark Bank's Sandbox, create a Webhook, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
-```
-https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
-```
-
-**1.2 - Simulating Webhook**
-To simulate locally a webhook call, you need to invoke the function `handler(event, context=None)` in `index.py` with the following dict as the first parameter:
+To simulate locally a webhook call, you can run the file `src/function/local_invoker.py`. This script invokes the function `handler(event, context=None)` in `index.py` with a dict as the first parameter, shaped like the following:
 
 ```python
 {"body": '{"event": {"log": {"invoice": {"amount": 100}}}}'}
 ```
 
-
-To do so, you can run the file `src/function/local_invoker`.
+The function `handler` is meant to do a transaction worth the same amount to a Stark Bank account, so further information is not needed on `body`.
 
 #### 2. Deployment to AWS
 
@@ -112,10 +105,20 @@ To deploy the project on AWS using CloudFormation:
 make deploy
 ```
 
-In order for the webhook to be called, go to Stark Bank's Sandbox, create a Webhook, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
+In order for the webhook to be called when a new invoice is created, go to Stark Bank's Sandbox, create a Webhook, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
 ```
 https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
 ```
+Then add `invoice` to the `Subscriptions` field.
+
+#### 3. Periodically creating invoices
+
+If you need to create invoices for the Stark Bank account on Sandbox, you can pip install `local_requirements.txt` in `src/function` and then run:
+```bash
+python src/function/periodic_issuer.py
+```
+
+This script issues 8 to 12 Invoices every 3 hours to random people for 24 hours. These invoices will trigger the Lambda function deployed on AWS.
 
 #### 3. Bring down deployment
 
@@ -131,18 +134,17 @@ If the Stack is stuck in DELETE_FAILED:
 make force-tear-down
 ```
 
-
 #### 4. Running Tests
 
-To run the tests locally, you need authentication variables to connect to Stark Bank, since these tests involve API connections. For such, you need to have PRIVATE_KEY and PROJECT_ID set as environment variables locally.
+To run the tests locally, you need authentication variables to connect to Stark Bank, since these tests involve API calls. For such, you need to have PRIVATE_KEY and PROJECT_ID set as environment variables locally.
 
 To install all packages (base and testing) and run the tests:
 
 ```bash
-make tests
+make test
 ```
 
-To only run the tests, if you already have the dependencies installed:
+To only run the tests, if you already have the test dependencies installed:
 
 ```bash
 pytest -vvs .
@@ -151,7 +153,7 @@ pytest -vvs .
 The tests include:
 
 - **`test_get_secrets`**: Ensures that secrets are correctly retrieved from AWS Secrets Manager.
-- **`test_handler_success`**: Tests a successful webhook event processing.
+- **`test_handler_success`**: Tests a successful webhook event processing, creating a new transaction.
 - **`test_handler_no_body`**: Tests the handler's response when no body is present in the event.
 - **`test_handler_amount_zero`**: Tests the response when the nominal amount is zero.
 - **`test_handler_missing_amount`**: Tests the response when the nominal amount is missing.
@@ -165,7 +167,7 @@ In `Makefile`, the following parameters can be changed:
   Path to the `requirements.txt` file, which contains the Python dependencies for your Lambda function.
 
 - **`ZIP_FILE`**:
-  The name of the zip file that will be created, containing the Lambda function code and dependencies.
+  The name of the ephemeral zip file that will be created, containing the Lambda function code and dependencies.
 
 - **`S3_BUCKET`**:
   The name of the S3 bucket where the zip file will be uploaded.
@@ -180,10 +182,10 @@ In `Makefile`, the following parameters can be changed:
   The name of the CloudFormation stack that will be created or updated.
 
 - **`TEST_REQUIREMENTS_FILE`**:
-  Path to the `test-requirements.txt` file, which contains the Python dependencies needed for testing.
+  Path to the `test_requirements.txt` file, which contains the Python dependencies needed for testing.
 
 - **`TEMP_DIR`**:
-  The temporary directory used during the build process, for storing intermediate files.
+  The temporary directory used during the build process for storing intermediate files.
 
 
 In `template.yaml`, the following parameters can be changed:
