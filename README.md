@@ -1,27 +1,27 @@
 # Stark Bank Challenge: Lambda Webhook Handler with Stark Bank Integration
 ### by Piero Desenzi
 
-This project is an AWS Lambda function designed to handle incoming webhook requests. It integrates with Stark Bank's API and utilizes AWS Secrets Manager for secure key management. The function processes the webhook events, performs financial transactions via Stark Bank, and returns appropriate responses based on the event data.
+This project is an AWS Lambda function designed to handle incoming webhook requests from Stark Bank. It integrates with the bank's API and utilizes AWS Secrets Manager for secure key management. The function processes the webhook events, performs financial transactions via Stark Bank's API, and returns appropriate responses based on the event data.
 
 ## Features
 
 - **AWS Lambda Function**: Handles incoming HTTP POST requests through API Gateway.
 - **Stark Bank Integration**: Processes financial transactions using Stark Bank's SDK.
-- **AWS Secrets Manager**: Securely retrieves and manages secrets such as private keys and project IDs.
 - **Error Handling**: Comprehensive error handling with logging for seamless debugging and monitoring.
 - **Test Coverage**: Includes unit tests using `pytest` with `moto` for mocking AWS services.
+- **One-line deploy**: The full deployment process on AWS is taken care of using Makefile
 
 ## Project Structure
 
 ```bash
 ├── src
-│   ├── template.yaml          # Unit tests for the handler function
+│   ├── template.yaml          # template for AWS CloudFormation
 │   └── function
-│       └── index.py           # Lambda function code
+│       └── index.py           # AWS Lambda code
 ├── tests
 │   ├── __init__.py            # Initialization file
 │   ├── test_requirements.txt  # Python dependencies for testing
-│   └── test_index.py          # Unit tests for the handler function
+│   └── test_index.py          # Unit tests for index.py
 ├── Makefile                   # Build commands
 ├── README.md                  # Project documentation
 └── requirements.txt           # Python dependencies
@@ -29,49 +29,115 @@ This project is an AWS Lambda function designed to handle incoming webhook reque
 
 ## Installation
 
-1. **Clone the repository**:
+#### 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/aws-lambda-webhook-starkbank.git
-   cd aws-lambda-webhook-starkbank
+   git clone https://github.com/pierodesenzi/stark-bank-challenge
+   cd stark-bank-challenge
    ```
 
-2. **Install Python dependencies**:
+#### 2. Install AWS CLI:
 
-   Make sure you have `pip` installed. Then, run:
+   Follow the [official installation guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) for your operating system.
+
+#### 3. Configure AWS CLI:
+
+   After installation, configure the CLI with your credentials:
 
    ```bash
-   pip install -r requirements.txt
+   aws configure
    ```
 
-3. **Install additional test dependencies**:
+   You'll be prompted to enter your AWS Access Key ID, Secret Access Key, region, and output format. Example:
 
-   This project uses `pytest` and `moto` for testing:
+   ```
+   AWS Access Key ID [None]: YOUR_ACCESS_KEY_ID
+   AWS Secret Access Key [None]: YOUR_SECRET_ACCESS_KEY
+   Default region name [None]: us-west-2
+   Default output format [None]: json
+   ```
+
+#### 4. Verify the Configuration:
+
+   To verify that the AWS CLI is set up correctly, run:
 
    ```bash
-   pip install pytest moto
+   aws sts get-caller-identity
    ```
+
+   This command should return details about your IAM identity.
+
+#### 5. Environment Setup:
+
+- Ensure that your AWS credentials are properly configured. This Lambda function relies on AWS Secrets Manager to store and retrieve sensitive information like `PRIVATE_KEY` and `PROJECT_ID`. Set these secrets in your AWS environment.
+- Create a role with permissions to S3, Secrets Manager, Lambda and CloudFormation, either via AWS CLI or the AWS web page.
+- Replace the values in templates.yaml, under `Parameters`, with the actual values of your AWS `client_id` and IAM Role name.
+
 
 ## Usage
 
-### 1. Environment Setup
+#### 1. Running Locally
 
-Ensure that you have AWS CLI installed and that your AWS credentials are properly configured. This Lambda function relies on AWS Secrets Manager to store and retrieve sensitive information like `PRIVATE_KEY` and `PROJECT_ID`. Set these secrets in your AWS environment.
+**1.1 - Periodically creating invoices**
 
-### 2. Running the Lambda Function Locally
+If you need to create invoices for the app running on AWS, you can install `local_requirements.txt` in `src/function` and then run:
+```bash
+python src/function/periodic_issuer.py
+```
 
-To test the function locally, you can invoke it through the `pytest` tests provided. The function retrieves the necessary secrets, processes the event payload, and interacts with Stark Bank.
+This script issues 8 to 12 Invoices every 3 hours to random people for 24 hours.
 
-### 3. Deploying to AWS
+**1.2 - Simulating Webhook**
+To simulate locally a webhook call, you need to invoke the function `handler(event, context=None)` in index.py with the following dict as the first parameter:
 
-You can deploy this Lambda function using AWS CloudFormation, AWS CLI, or other deployment tools like Serverless Framework. Make sure to configure your Lambda function's environment variables and IAM roles properly.
+```python
+{"body": '{"event": {"log": {"invoice": {"nominalAmount": 100}}}}'}
+```
 
-### 4. Running Tests
+To do so, you can run the file `src/function/local_invoker`.
 
-To run the tests:
+#### 2. Deployment to AWS
+
+To deploy the project on AWS using CloudFormation:
 
 ```bash
-make test
+make deploy
+```
+
+In order for the webhook to be called, go to Stark Bank's Sandbox, create a Webhook, and add the API Gateway link for the `/webhook` endpoint in the URL field. The link should look like this:
+```
+https://ucza2pi6t6.execute-api.us-west-2.amazonaws.com/prod/webhook
+```
+
+#### 3. Bring down deployment
+
+To tear down a Stack created with AWS CloudFormation (considering the name of the Stack was not changed in Makefile since the deployment):
+
+```bash
+make tear-down
+```
+
+If the Stack is stuck in DELETE_FAILED:
+
+```bash
+make force-tear-down
+```
+
+
+#### 4. Running Tests
+
+To run the tests locally, you need authentication variables to connect to Stark Bank, since these tests involve API connections. For such, you need to have PRIVATE_KEY and PROJECT_ID set as environment variables locally.
+
+To install all packages (base and testing) and run the tests:
+
+```bash
+make test-routine
+```
+
+To only run the tests, if you already have the dependencies installed:
+
+```bash
+pytest -vvs .
 ```
 
 The tests include:
@@ -82,19 +148,46 @@ The tests include:
 - **`test_handler_nominalAmount_zero`**: Tests the response when the nominal amount is zero.
 - **`test_handler_missing_nominalAmount`**: Tests the response when the nominal amount is missing.
 
-### 5. Building and Packaging
-
-To create a deployment package, including the Lambda function code and its dependencies, use the Makefile provided:
-
-```bash
-make zip
-```
-
-This will create a `.zip` file containing your Lambda function ready for deployment.
 
 ## Configuration
 
-### Changing Lambda Timeout
+In `Makefile`, the following parameters can be changed:
 
-- makefile vars
-- template.yaml
+- **`REQUIREMENTS_FILE`**:
+  Path to the `requirements.txt` file, which contains the Python dependencies for your Lambda function.
+
+- **`ZIP_FILE`**:
+  The name of the zip file that will be created, containing the Lambda function code and dependencies.
+
+- **`S3_BUCKET`**:
+  The name of the S3 bucket where the zip file will be uploaded.
+
+- **`S3_ZIP_PATH`**:
+  The path within the S3 bucket where the zip file will be stored.
+
+- **`TEMPLATE_FILE`**:
+  The name of the CloudFormation template file (`template.yaml`) used to deploy the AWS resources.
+
+- **`STACK_NAME`**:
+  The name of the CloudFormation stack that will be created or updated.
+
+- **`TEST_REQUIREMENTS_FILE`**:
+  Path to the `test-requirements.txt` file, which contains the Python dependencies needed for testing.
+
+- **`TEMP_DIR`**:
+  The temporary directory used during the build process, typically for storing intermediate files.
+
+
+In `template.yaml`, the following parameters can be changed:
+
+- **`ClientId`**:
+  AWS account ID that owns the IAM role. This is used to construct the ARN for the Lambda execution role.
+
+- **`RoleName`**:
+  Name of the IAM role that the Lambda function will use to execute. This role must have the necessary permissions to access resources like S3, Secrets Manager, Lambda, and CloudFormation.
+
+- **`Timeout`**:
+  The amount of time that the Lambda function is allowed to run before it is terminated. This is specified in seconds.
+
+- **`ApiGateway.Properties.Name`**:
+  The name of the API Gateway that will be created for the Lambda function. This name will be visible in the AWS API Gateway console.

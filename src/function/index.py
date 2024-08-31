@@ -63,7 +63,7 @@ def _evaluate_amount(body_dict: dict[str, any]) -> tuple[dict[str, any] | None, 
         return None, amount
 
 
-def handler(event, context):
+def handler(event, context=None):
     """
     AWS Lambda function handler to process incoming webhook requests.
 
@@ -93,6 +93,7 @@ def handler(event, context):
 
     try:
         # Extract the 'body' field from the event, which contains the JSON payload
+        breakpoint()
         body_str = event.get("body")
         if not body_str:
             logging.error("No body found in the event")
@@ -135,5 +136,6 @@ def handler(event, context):
 
     except Exception as e:
         # Log any exceptions that occur during the handling of the event
-        logging.error(f"An error occurred during the handling of the event: {str(e)}")
-        return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
+        ###logging.error(f"An error occurred during the handling of the event: {str(e)}")
+        ###return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
+        raise e

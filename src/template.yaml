@@ -1,14 +1,36 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  ClientId:
+    Type: String
+    Default: "423623843304"
+    Description: "The AWS account ID that owns the role."
+  
+  RoleName:
+    Type: String
+    Default: "LambdaExecutionRole3"
+    Description: "The name of the IAM role for the Lambda function."
+
+  Timeout:
+    Type: Number
+    Default: 10
+    Description: "The timeout for the Lambda function in seconds."
+
+  ApiGatewayName:
+    Type: String
+    Default: "StarkApi"
+    Description: "The name of the API Gateway."
+
 Resources:
   LambdaFunction:
     Type: 'AWS::Lambda::Function'
     Properties:
       Runtime: 'python3.12'
-      Role: arn:aws:iam::423623843304:role/LambdaExecutionRole3
+      Role: !Sub 'arn:aws:iam::${ClientId}:role/${RoleName}'
       Handler: 'index.handler'
-      Timeout: 10
+      Timeout: !Ref Timeout
       Code:
-        S3Bucket: 'stark-service'
+        S3Bucket: 'stark-bucket-for-lambda'
         S3Key: 'lambda_resources.zip'
       Environment:
         Variables:
@@ -18,7 +40,7 @@ Resources:
   ApiGateway:
     Type: 'AWS::ApiGateway::RestApi'
     Properties:
-      Name: 'StarkApi'
+      Name: !Ref ApiGatewayName
 
   ApiGatewayResource:
     Type: 'AWS::ApiGateway::Resource'

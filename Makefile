@@ -3,7 +3,7 @@
 # Variables
 REQUIREMENTS_FILE=requirements.txt
 ZIP_FILE=lambda_resources.zip
-S3_BUCKET=stark-service
+S3_BUCKET=stark-bucket-for-lambda
 S3_ZIP_PATH=s3://$(S3_BUCKET)/lambda_resources.zip
 TEMPLATE_FILE=src/template.yaml
 STACK_NAME=LambdaStack
@@ -38,8 +38,9 @@ force-tear-down:
 	@echo "Forcefully tearing down stack created with AWS CloudFormation (for stacks in DELETE_FAILED state)..."
 	aws cloudformation delete-stack --stack-name $(STACK_NAME) --deletion-mode FORCE_DELETE_STACK
 
-# Test Routine
-test:
+test-routine:
+	@echo "Installing base dependencies..."
+	pip install -r $(REQUIREMENTS_FILE)
 	@echo "Installing test dependencies..."
 	pip install -r $(TEST_REQUIREMENTS_FILE)
 	@echo "Running tests..."
