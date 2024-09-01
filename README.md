@@ -96,7 +96,7 @@ To simulate locally a webhook call, you can run the file `src/local/local_invoke
 {"body": '{"event": {"log": {"invoice": {"amount": 100}}}}'}
 ```
 
-The function `handler` is meant to do a transaction worth the same amount to a Stark Bank account, so further information is not needed on `body`.
+The function `handler` is meant to receive this transacion dict and do a transaction worth the same amount to a Stark Bank account, so further information is not needed on `body`.
 
 #### 2. Deployment to AWS
 
